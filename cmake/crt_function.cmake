@@ -1,6 +1,6 @@
 # === C-RT Function DLL Project ===
 
-set(CRT_DLL_TARGET_NAME crt_function_dll)
+set(CRT_DLL_TARGET_NAME crt_function)
 
 file(GLOB_RECURSE crt_function_SOURCES
     "${PROJECT_ROOT}/examples/crt_function_demo/src/*.cpp"
