@@ -42,7 +42,6 @@ class VIARequest;
 class VIAEnvVar;
 class VIAUtil;
 
-
 #if defined ( _BUILDNODELAYERDLL )
 #define VIACLIENT(type)  extern "C" __declspec (dllexport) type __stdcall
 #else

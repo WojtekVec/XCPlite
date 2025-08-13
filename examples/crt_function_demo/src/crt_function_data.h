@@ -29,6 +29,11 @@ namespace Const
   static constexpr uint16_t DimY = 20;
 }
 
+extern "C" 
+{
+  // Algorithm calculation time (ns) as provided by the host.
+  VIATime gCalcTime;
+}
 
 // Start: simulation time ===========================================
 /*
@@ -123,17 +128,6 @@ struct OutputData
   @@ END
   */
   double output2;
-
-  /*
-  @@ ELEMENT = output3
-  @@ STRUCTURE = OutputData
-  @@ A2L_TYPE = MEASURE
-  @@ DATA_TYPE = DOUBLE
-  @@ DESCRIPTION = "Function output port 2 data"
-  @@ EVENT XCP = VARIABLE 0 1 2 3
-  @@ END
-  */
-  double output3;
 };
 
 

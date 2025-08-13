@@ -21,8 +21,7 @@
 #include "nlapml_i.h"
 #include "nlapml_v.h"
 #include "Timer.h"
-#include "xcp/xcp_cfg.h"
-#include "xcp/xcp_par.h"
+#include "via.h"
 
 #include <cstdint>
 
@@ -491,6 +490,16 @@ VIASTDDEF VNLAPMLLayer::EndMeasurement()
 
   return kVIA_OK;
 }
+
+namespace
+{
+  // TODO: replace with XCPlite function calls ...
+  void xcpEvent(uint8_t event_id) 
+  {
+    // noop ...
+  }
+}
+
 
 // VIAOnTimerSink
 VIASTDDEF VNLAPMLLayer::OnTimer(VIATime nanoseconds)

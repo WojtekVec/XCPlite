@@ -16,7 +16,6 @@
 
 #include "crt_function.h"
 #include "crt_function_data.h"
-#include "example_function/example_function.h"
 
 #include "metainfo.h"
 
@@ -43,8 +42,8 @@ struct sUserVar gUserInputVar[] =
   //{kBinary,            "binInput",         16384,     BinaryVariable::kZeroSize } // example of binary data input port
 
   // inputs to be mapped with the example functions
-  { kNumeric, "input1", 1, 1 },   //example of a scalar input port
-  { kNumeric, "input2", 1, 1 }    //example of another scalar input port
+  { kNumeric, "input1", 1, 1 },   // example of a scalar input port
+  { kNumeric, "input2", 1, 1 },   // example of another scalar input port
 };
 
 uint32_t gSizeUserInputVar = sizeof(gUserInputVar) / sizeof(sUserVar);
@@ -65,7 +64,6 @@ struct sUserVar gUserOutputVar[] =
   // outputs to be mapped with the example functions
   { kNumeric, "output1", 1, 1 },
   { kNumeric, "output2", 1, 1 },
-  { kNumeric, "output3", 1, 1 }
 };
 
 uint32_t gSizeUserOutputVar = sizeof(gUserOutputVar) / sizeof(sUserVar);
@@ -90,9 +88,6 @@ void VCrtFunction::InitMeasurement()
 {  
   // initialize simulation time
   simTime = 0.0;
-  // initialize parameter values
-  linear_function_init();
-  filter_function_init();
 }
 
 /**
@@ -122,12 +117,6 @@ void VCrtFunction::InitData()
  */
 void VCrtFunction::StartMeasurement()
 {
-  // number of ticks for fixed-step simulation
-  gFixedStepTicks = static_cast<uint64_t>(gStepSize * gExtTimeFactor);
-  // reset external timer value and timer ticks
-  gExtTimeValue = 0.0;
-  gTimerTicks = 0;
-
   // Write the following string to CANape/vSignalyzer (host) Write-Window.
   WriteString("VCrtFunction START Measurement");
 
@@ -141,7 +130,6 @@ void VCrtFunction::StartMeasurement()
   // initialize output port data values
   outputData.output1 = 0.0;
   outputData.output2 = 0.0;
-  outputData.output3 = 0.0;
 }
 
 /**
@@ -172,31 +160,6 @@ void VCrtFunction::calcArray(const double phaseShift)
  */
 void VCrtFunction::Calculate()
 {
-  //ToDo: Do your calculations here.
-
-  //////
-  // Examples for scalar and array values
-  ///////////////
-
-  //Example 1:
-  //mPorts["output1"]->SetValue(mPorts["input1"]->GetValue() * par_gain);
-  //Example 2:
-  //mPorts["output2"]->SetValue(2, mPorts["input2"]->GetValue(1) * par_gain);
-  //Example 3:
-  //for (int i = 0; i < mPorts["output2"]->GetCols(); i++)
-  //{
-  //  mPorts["output2"]->SetValue(i, mPorts["input2"]->GetValue(i) * par_gain);
-  //}
-
-  //////
-  // Binary Data Processing example
-  ///////////////
-
-  ////copy the whole data buffer to inputData.buffer
-  //mPorts["input4"]->GetData(inputData.buffer, 16384);
-  ////writes binary data buffer to the mapped output port object
-  //mPorts["output4"]->SetData(outBuffer, 16384);
-
   //////
   // User defined function example
   ///////////////
@@ -204,19 +167,13 @@ void VCrtFunction::Calculate()
   inputData.input1 = mPorts["input1"]->GetValue();
   inputData.input2 = mPorts["input2"]->GetValue();
 
-  // call custom function
-  linear_function(&inputData.input1, &outputData.output1);
-  filter_function(&inputData.input2, &outputData.output2);
-
   // process internal data
   fcnCounter1 = fcnCounter1 + 1;
   fcnCounter2 = fcnCounter2 + 1;
-  outputData.output3 = fmod(outputData.output3 + 0.01, 1.0);
 
   // perform output port value mapping
   mPorts["output1"]->SetValue(outputData.output1);
   mPorts["output2"]->SetValue(outputData.output2);
-  mPorts["output3"]->SetValue(outputData.output3);
 
   // calculate the internal array measurement object
   calcArray(simTime);

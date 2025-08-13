@@ -12,10 +12,6 @@
 #pragma once
 
 #include "via\via.h"
-extern "C"
-{
-#include "xcp\xcpServer.h"
-}
 
 class VAPMLLayer
 {

@@ -25,7 +25,6 @@ project(xcplib VERSION 0.9.2 LANGUAGES C CXX)
 # Find required packages
 find_package(Threads REQUIRED)
 
-
 # Set default generator for Windows to Visual Studio 2022
 if(WIN32 AND NOT DEFINED CMAKE_GENERATOR)
     set(CMAKE_GENERATOR "Visual Studio 17 2022")
@@ -125,7 +124,6 @@ if(HAVE_LIBATOMIC)
     target_link_libraries(xcplib PUBLIC atomic)
 endif()
 
-
 # Example hello_xcp
 set(hello_xcp_SOURCES examples/hello_xcp/src/main.c)   
 set_source_files_properties(${hello_xcp_SOURCES} PROPERTIES LANGUAGE C)
@@ -159,6 +157,12 @@ add_executable(cpp_demo examples/cpp_demo/src/main.cpp examples/cpp_demo/src/sig
 target_include_directories(cpp_demo PUBLIC "${PROJECT_ROOT}" "${PROJECT_ROOT}/src")
 target_link_libraries(cpp_demo PRIVATE xcplib)
 
+# Example crt_function_demo
+if(WIN32 AND PLATFORM_64BIT)
+    # The C-RT function DLL is only available for Windows.
+    # Include the C-RT function DLL CMake project.
+    include("${PROJECT_ROOT}/cmake/crt_function.cmake")
+endif()
 
 # Tests
 if(BUILD_TEST)

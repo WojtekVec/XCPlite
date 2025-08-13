@@ -24,13 +24,9 @@
 
 #include <cstdint>
 
-// Start: external time source variables ==============================
-extern "C" uint64_t gTimerTicks;
-extern "C" double gExtTimeValue;
-extern "C" double gExtTimeFactor;
-extern "C" uint64_t gFixedStepTicks;
+// Fixed Step Size (Fundamental Sample Time): 0.1s (100ms)
+extern "C" double gStepSize = 0.1;
 
-extern "C" double gStepSize = 0.1; // Fixed Step Size (Fundamental Sample Time): 0.1s (100ms)
 // End: external time source variables ================================
 
 extern sUserVar gUserInputVar[];
