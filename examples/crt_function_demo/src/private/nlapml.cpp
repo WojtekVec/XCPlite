@@ -23,6 +23,12 @@
 #include "Timer.h"
 #include "via.h"
 
+// xcplib A2l generation
+#include "a2l.h"
+#include "platform.h" 
+// xcplib application programming interface
+#include "xcplib.h"   
+
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -290,6 +296,38 @@ VNLAPMLLayer::~VNLAPMLLayer()
 #endif
 }
 
+
+namespace Xcp 
+{
+  // XCP params
+  static constexpr const char *OptionProjectName = "crt_function";
+  static constexpr bool OptionUseTcp = false;
+  static constexpr uint16_t OptionServerPort = 5555;
+  static constexpr uint8_t OptionServerAddress[] = {0, 0, 0, 0};
+  static constexpr uint32_t OptionQueueSize = 1024 * 64;
+  static constexpr uint8_t OptionLogLevel = 3;
+}
+
+void VNLAPMLLayer::InitXcp() 
+{
+  // XCP: Set log level (1-error, 2-warning, 3-info, 4-show XCP commands)
+  XcpSetLogLevel(Xcp::OptionLogLevel);
+
+  // XCP: Initialize the XCP singleton, activate XCP, must be called before starting the server
+  // If XCP is not activated, the server will not start and all XCP instrumentation will be passive with minimal overhead
+  XcpInit(true);
+
+  // XCP: Create the XCP measurement events
+  // basic rate
+  DaqCreateEvent(baseRate);
+  // basic rate / 10
+  DaqCreateEvent(step10th);
+  // basic rate / 100
+  DaqCreateEvent(step100th);
+  // basic rate / 1000
+  DaqCreateEvent(step1000th);
+}
+
 // VIANodeLayerApi
 VIASTDDEF VNLAPMLLayer::GetNode(VIANode** node)
 {
@@ -305,6 +343,7 @@ VIASTDDEF VNLAPMLLayer::GetNode(VIANode** node)
 
 VIASTDDEF VNLAPMLLayer::InitMeasurement()
 {
+  InitXcp();
   // init counter
   _gRTTarget_ModelExecutionCounter = 0;
   // init measurement event
@@ -491,16 +530,6 @@ VIASTDDEF VNLAPMLLayer::EndMeasurement()
   return kVIA_OK;
 }
 
-namespace
-{
-  // TODO: replace with XCPlite function calls ...
-  void xcpEvent(uint8_t event_id) 
-  {
-    // noop ...
-  }
-}
-
-
 // VIAOnTimerSink
 VIASTDDEF VNLAPMLLayer::OnTimer(VIATime nanoseconds)
 {
@@ -509,24 +538,23 @@ VIASTDDEF VNLAPMLLayer::OnTimer(VIATime nanoseconds)
   gExecTimer.Reset();
   result = PerformSimulationStep();
 
-  // XCP events
-  // Base Sample Time
-  xcpEvent((uint8_t)0);
+  // XCP: Trigger Base Sample Time Event
+  DaqEvent(baseRate);
   // slower XCP events
   if (0 == (_gRTTarget_ModelExecutionCounter % 10))
   {
     // Sample Time / 10 
-    xcpEvent((uint8_t)1);
+    DaqEvent(step10th);
   }
   if (0 == (_gRTTarget_ModelExecutionCounter % 100))
   {
     // Sample Time / 100
-    xcpEvent((uint8_t)2);
+    DaqEvent(step100th);
   }
   if (0 == (_gRTTarget_ModelExecutionCounter % 1000))
   {
     // Sample Time / 1000
-    xcpEvent((uint8_t)3);
+    DaqEvent(step1000th);
   }
 
   // check time at execution end

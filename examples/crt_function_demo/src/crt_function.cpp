@@ -167,6 +167,10 @@ void VCrtFunction::Calculate()
   inputData.input1 = mPorts["input1"]->GetValue();
   inputData.input2 = mPorts["input2"]->GetValue();
 
+  outputData.output1 = gain * (inputData.input1 + inputData.input2);
+  // output the current simulation time
+  outputData.output2 = simTime;
+
   // process internal data
   fcnCounter1 = fcnCounter1 + 1;
   fcnCounter2 = fcnCounter2 + 1;

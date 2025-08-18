@@ -35,6 +35,18 @@ extern "C"
   VIATime gCalcTime;
 }
 
+// Start: gain parameter ============================================
+/*
+@@ SYMBOL = gain
+@@ A2L_TYPE = PARAMETER
+@@ DATA_TYPE = DOUBLE [ 0 ... 10 ]
+@@ DESCRIPTION = "Gain parameter"
+@@ GROUP = parameters
+@@ END
+*/
+double gain = 2.0;
+// End: gain parameter ==============================================
+
 // Start: simulation time ===========================================
 /*
 @@ SYMBOL = simTime
