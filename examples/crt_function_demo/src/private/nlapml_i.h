@@ -150,6 +150,9 @@ class VNLAPMLLayer : public VIANodeLayerApi, public VIAOnTimerSink, public VIAOn
     /** Init the XCP protocol/server for the C-RT function. */
     void InitXcp();
 
+    /** Terminate the XCP protocol/server. */
+    void ExitXcp();
+
     VIAService *mService;
     VIANode *mNode;
     VIATimer *mTimer;

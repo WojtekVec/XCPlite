@@ -29,6 +29,8 @@
 // xcplib application programming interface
 #include "xcplib.h"   
 
+#include "intrin.h"
+
 #include <cstdint>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -240,6 +242,20 @@ VIASTDDEF VNLAPMLModule::EndMeasurement()
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+
+namespace Xcp 
+{
+  // XCP params
+  static constexpr const char *OptionProjectName = "crt_function";
+  static constexpr bool OptionUseTcp = false;
+  static constexpr uint16_t OptionServerPort = 5555;
+  static constexpr uint8_t OptionServerAddress[] = { 0, 0, 0, 0 };
+  static constexpr uint32_t OptionQueueSize = 1024 * 64;
+  static constexpr uint8_t OptionLogLevel = 3;
+}
+
+
 VNLAPMLLayer::VNLAPMLLayer(VIAService* service, VIANode* node)
   : mService(service)
   , mNode(node)
@@ -249,14 +265,8 @@ VNLAPMLLayer::VNLAPMLLayer(VIAService* service, VIANode* node)
   , mEventsEnable(0)
   , mAlgorithm(NULL)
 {
-
-#ifdef XCP_TRANSPORT_LAYER_ETH
-  // start XCP socket server for ETH communication
-  const int kTcpProto = SOCK_STREAM;
-  const int kUdpProto = SOCK_DGRAM;
-  const unsigned short ethPort = 5555;
-  xcpStartServer(kUdpProto, ethPort);
-#endif
+  // initialize the XCP server
+  InitXcp();
 
   // init global data
   _gRTTarget_ModelStepExecutionTime = 0;
@@ -290,22 +300,8 @@ VNLAPMLLayer::~VNLAPMLLayer()
   delete mAlgorithm;
   mAlgorithm = NULL;
 
-#ifdef XCP_TRANSPORT_LAYER_ETH
-  // stop XCP socket server
-  xcpStopServer();
-#endif
-}
-
-
-namespace Xcp 
-{
-  // XCP params
-  static constexpr const char *OptionProjectName = "crt_function";
-  static constexpr bool OptionUseTcp = false;
-  static constexpr uint16_t OptionServerPort = 5555;
-  static constexpr uint8_t OptionServerAddress[] = {0, 0, 0, 0};
-  static constexpr uint32_t OptionQueueSize = 1024 * 64;
-  static constexpr uint8_t OptionLogLevel = 3;
+  // terminate the XCP server
+  ExitXcp();
 }
 
 void VNLAPMLLayer::InitXcp() 
@@ -326,6 +322,22 @@ void VNLAPMLLayer::InitXcp()
   DaqCreateEvent(step100th);
   // basic rate / 1000
   DaqCreateEvent(step1000th);
+
+  // XCP: Initialize the XCP Server
+  if (!XcpEthServerInit(Xcp::OptionServerAddress, Xcp::OptionServerPort, Xcp::OptionUseTcp, Xcp::OptionQueueSize)) 
+  {
+    // socket error: port is busy or a fatal socket error!
+    return;
+  }
+}
+
+void VNLAPMLLayer::ExitXcp() 
+{
+  // XCP: Force the disconnection of the XCP client
+  XcpDisconnect();
+
+  // XCP: Stop the XCP server
+  XcpEthServerShutdown();
 }
 
 // VIANodeLayerApi
@@ -343,7 +355,6 @@ VIASTDDEF VNLAPMLLayer::GetNode(VIANode** node)
 
 VIASTDDEF VNLAPMLLayer::InitMeasurement()
 {
-  InitXcp();
   // init counter
   _gRTTarget_ModelExecutionCounter = 0;
   // init measurement event
