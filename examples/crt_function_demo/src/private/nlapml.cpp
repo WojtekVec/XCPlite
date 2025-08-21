@@ -304,7 +304,7 @@ VNLAPMLLayer::~VNLAPMLLayer()
   ExitXcp();
 }
 
-void VNLAPMLLayer::InitXcp() 
+bool VNLAPMLLayer::InitXcp() 
 {
   // XCP: Set log level (1-error, 2-warning, 3-info, 4-show XCP commands)
   XcpSetLogLevel(Xcp::OptionLogLevel);
@@ -327,8 +327,10 @@ void VNLAPMLLayer::InitXcp()
   if (!XcpEthServerInit(Xcp::OptionServerAddress, Xcp::OptionServerPort, Xcp::OptionUseTcp, Xcp::OptionQueueSize)) 
   {
     // socket error: port is busy or a fatal socket error!
-    return;
+    return false;
   }
+
+  return true;
 }
 
 void VNLAPMLLayer::ExitXcp() 
@@ -338,6 +340,17 @@ void VNLAPMLLayer::ExitXcp()
 
   // XCP: Stop the XCP server
   XcpEthServerShutdown();
+}
+
+bool VNLAPMLLayer::CreateA2lDatabase() 
+{
+  // Enable A2L generation and prepare the A2L file, finalize the A2L file on XCP connect
+  if (!A2lInit(Xcp::OptionProjectName, nullptr, Xcp::OptionServerAddress, Xcp::OptionServerPort, Xcp::OptionUseTcp, A2L_MODE_WRITE_ALWAYS | A2L_MODE_FINALIZE_ON_CONNECT | A2L_MODE_AUTO_GROUPS))
+  {
+    return false;
+  }
+
+  return true;
 }
 
 // VIANodeLayerApi

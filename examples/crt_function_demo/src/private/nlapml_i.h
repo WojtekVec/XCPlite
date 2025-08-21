@@ -148,10 +148,13 @@ class VNLAPMLLayer : public VIANodeLayerApi, public VIAOnTimerSink, public VIAOn
 
   private:
     /** Init the XCP protocol/server for the C-RT function. */
-    void InitXcp();
+    bool InitXcp();
 
     /** Terminate the XCP protocol/server. */
     void ExitXcp();
+
+    /** Create ASAP2 database file with calibration parameters and measurements. */
+    bool CreateA2lDatabase();
 
     VIAService *mService;
     VIANode *mNode;
