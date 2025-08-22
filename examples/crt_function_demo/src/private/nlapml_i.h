@@ -153,9 +153,6 @@ class VNLAPMLLayer : public VIANodeLayerApi, public VIAOnTimerSink, public VIAOn
     /** Terminate the XCP protocol/server. */
     void ExitXcp();
 
-    /** Create ASAP2 database file with calibration parameters and measurements. */
-    bool CreateA2lDatabase();
-
     VIAService *mService;
     VIANode *mNode;
     VIATimer *mTimer;

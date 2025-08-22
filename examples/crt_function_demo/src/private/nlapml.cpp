@@ -23,11 +23,12 @@
 #include "Timer.h"
 #include "via.h"
 
+#include "xcpConfig.h"
+
 // xcplib A2l generation
 #include "a2l.h"
-#include "platform.h" 
 // xcplib application programming interface
-#include "xcplib.h"   
+#include "xcplib.h"
 
 #include "intrin.h"
 
@@ -243,19 +244,6 @@ VIASTDDEF VNLAPMLModule::EndMeasurement()
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-
-namespace Xcp 
-{
-  // XCP params
-  static constexpr const char *OptionProjectName = "crt_function";
-  static constexpr bool OptionUseTcp = false;
-  static constexpr uint16_t OptionServerPort = 5555;
-  static constexpr uint8_t OptionServerAddress[] = { 0, 0, 0, 0 };
-  static constexpr uint32_t OptionQueueSize = 1024 * 64;
-  static constexpr uint8_t OptionLogLevel = 3;
-}
-
-
 VNLAPMLLayer::VNLAPMLLayer(VIAService* service, VIANode* node)
   : mService(service)
   , mNode(node)
@@ -265,13 +253,13 @@ VNLAPMLLayer::VNLAPMLLayer(VIAService* service, VIANode* node)
   , mEventsEnable(0)
   , mAlgorithm(NULL)
 {
-  // initialize the XCP server
-  InitXcp();
-
   // init global data
   _gRTTarget_ModelStepExecutionTime = 0;
   _gRTTarget_ModelExecutionCounter = 0;
   mAlgorithm = VCrtBase::CreateCrtFunction(service);
+
+  // initialize the XCP server
+  InitXcp();
 }
 
 VNLAPMLLayer::~VNLAPMLLayer()
@@ -340,17 +328,6 @@ void VNLAPMLLayer::ExitXcp()
 
   // XCP: Stop the XCP server
   XcpEthServerShutdown();
-}
-
-bool VNLAPMLLayer::CreateA2lDatabase() 
-{
-  // Enable A2L generation and prepare the A2L file, finalize the A2L file on XCP connect
-  if (!A2lInit(Xcp::OptionProjectName, nullptr, Xcp::OptionServerAddress, Xcp::OptionServerPort, Xcp::OptionUseTcp, A2L_MODE_WRITE_ALWAYS | A2L_MODE_FINALIZE_ON_CONNECT | A2L_MODE_AUTO_GROUPS))
-  {
-    return false;
-  }
-
-  return true;
 }
 
 // VIANodeLayerApi

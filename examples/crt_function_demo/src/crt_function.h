@@ -61,5 +61,8 @@ public:
   virtual void EndMeasurement() override;
 
 private:
+  /** Create ASAP2 database file with calibration parameters and measurements. */
+  bool CreateA2lDatabase();
+
   void calcArray(const double);
 };

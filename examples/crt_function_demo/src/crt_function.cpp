@@ -14,10 +14,19 @@
  ----------------------------------------------------------------------------*/
 #pragma warning( disable:4786)
 
+// include Winsock2 first to avoid redundant includes and type redefinitions
+#include <winsock2.h>
+
 #include "crt_function.h"
 #include "crt_function_data.h"
 
 #include "metainfo.h"
+
+#include "xcpConfig.h"
+// xcplib A2l generation
+#include "a2l.h"
+// xcplib application programming interface
+#include "xcplib.h"
 
 #define _USE_MATH_DEFINES
 
@@ -75,6 +84,25 @@ VCrtBase *VCrtBase::CreateCrtFunction(VIAService *pService)
 {
   // return a new instance of the C-RT Function class
   return new VCrtFunction(pService);
+}
+
+bool VCrtFunction::CreateA2lDatabase() 
+{
+  // Enable A2L generation and prepare the A2L file, finalize the A2L file on XCP connect
+  if (!A2lInit(Xcp::OptionProjectName, nullptr, Xcp::OptionServerAddress, Xcp::OptionServerPort, Xcp::OptionUseTcp,
+               A2L_MODE_WRITE_ALWAYS | A2L_MODE_FINALIZE_ON_CONNECT | A2L_MODE_AUTO_GROUPS)) {
+      return false;
+  }
+
+  // Register global measurement variables
+  A2lSetAbsoluteAddrMode(baseRate);
+  A2lCreateMeasurement(simTime, "Measurement variable");
+  A2lCreateMeasurement(fcnCounter1, "Measurement variable");
+  A2lCreateMeasurement(fcnCounter2, "Measurement variable");
+
+  A2lCreateParameter(gain, "Gain parameter", "", 0, 100);
+
+  return true;
 }
 
 /**
