@@ -67,7 +67,7 @@
 #ifndef XCPLIB_FOR_RUST
 
 // CAL
-#define OPTION_CAL_PERSISTENCE // Enable calibration segment persistence, BIN file is used to store calibration segments, A2L maybe generated only once per build
+//#define OPTION_CAL_PERSISTENCE // Enable calibration segment persistence, BIN file is used to store calibration segments, A2L maybe generated only once per build
 
 // DAQ
 #define OPTION_DAQ_MEM_SIZE (1000 * 6) // Memory bytes used for XCP DAQ tables - max 6 bytes per measurement signal needed

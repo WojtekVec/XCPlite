@@ -66,7 +66,7 @@
 #endif // XCP_ENABLE_ABS_ADDRESSING
 
 // Segment or application specific addressing mode
-#define XCP_ENABLE_APP_ADDRESSING
+//#define XCP_ENABLE_APP_ADDRESSING
 #ifdef XCP_ENABLE_APP_ADDRESSING
 
 // Use addr_ext XCP_ADDR_EXT_APP/SEG to indicate application specific addr format or segment relative address format
@@ -181,7 +181,7 @@
 // Enable calibration segment list
 #ifndef XCPLIB_FOR_RUST // Not needed for Rust xcp-lite, has its own calibration segment management
 
-#define XCP_ENABLE_CALSEG_LIST
+//#define XCP_ENABLE_CALSEG_LIST
 #endif
 #ifdef XCP_ENABLE_CALSEG_LIST
 
@@ -200,7 +200,7 @@
 // Timeout for acquiring a free calibration segment page
 #define XCP_CALSEG_AQUIRE_FREE_PAGE_TIMEOUT 500 // 500 ms timeout
 
-#endif
+#endif // XCPLIB_FOR_RUST
 
 // Overrun indication via PID
 // Not needed for Ethernet, client detects data loss via transport layer counters

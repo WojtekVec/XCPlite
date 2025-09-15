@@ -607,9 +607,12 @@ static void A2lCreateMeasurement_IF_DATA(void) {
                 fprintf(gA2lFile, " /begin IF_DATA XCP /begin DAQ_EVENT VARIABLE /begin DEFAULT_EVENT_LIST EVENT 0x%X /end DEFAULT_EVENT_LIST /end DAQ_EVENT /end IF_DATA",
                         gA2lDefaultEvent);
             }
-        } else if (gAl2AddrExt != XCP_ADDR_EXT_SEG) {
+        } 
+#ifdef XCP_ENABLE_APP_ADDRESSING
+        else if (gAl2AddrExt != XCP_ADDR_EXT_SEG) {
             assert(false);
         }
+#endif
     }
 }
 
@@ -835,12 +838,14 @@ uint32_t A2lGetAddr_(const void *p) {
             }
             return (uint32_t)(((uint32_t)gA2lFixedEvent) << 16 | (addr_diff & 0xFFFF));
         }
+#ifdef XCP_ENABLE_APP_ADDRESSING
         case XCP_ADDR_EXT_SEG: {
             uint64_t addr_diff = (uint64_t)p - (uint64_t)gA2lAddrBase;
             // Ensure the relative address does not overflow the 16 Bit A2L address offset for calibration segment relative addressing
             assert((addr_diff >> 16) == 0);
             return XcpGetCalSegBaseAddress(gA2lAddrIndex) + (addr_diff & 0xFFFF);
         }
+#endif 
         }
         DBG_PRINTF_ERROR("A2L address extension %u is not supported!\n", gAl2AddrExt);
     }
@@ -1464,10 +1469,10 @@ bool A2lInit(const char *a2l_projectname, const char *a2l_version, const uint8_t
 
     // If the binary persistence mode is not enabled, enable the write_always mode
 #ifndef OPTION_CAL_PERSISTENCE
-    if (!write_always) {
-        DBG_PRINT_WARNING("A2lInit: OPTION_CAL_PERSISTENCE not enabled, write_always is set to true!\n");
-        write_always = true;
-    }
+    //if (!write_always) {
+    //    DBG_PRINT_WARNING("A2lInit: OPTION_CAL_PERSISTENCE not enabled, write_always is set to true!\n");
+    //    write_always = true;
+    //}
 #endif // OPTION_CAL_PERSISTENCE
 
     // Save communication parameters
