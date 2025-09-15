@@ -200,6 +200,7 @@ uint8_t *ApplXcpGetPointer(uint8_t addr_ext, uint32_t addr) {
 
 #ifdef _WIN
 
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 static uint8_t *baseAddr = NULL;
 static uint8_t baseAddrValid = 0;
 
@@ -208,7 +209,8 @@ static uint8_t baseAddrValid = 0;
 uint8_t *ApplXcpGetBaseAddr(void) {
 
     if (!baseAddrValid) {
-        baseAddr = (uint8_t *)GetModuleHandle(NULL);
+        // refer to the base address of the current module DLL or EXE
+        baseAddr = (uint8_t *)&__ImageBase;
         baseAddrValid = 1;
         DBG_PRINTF4("ApplXcpGetBaseAddr() = 0x%I64X\n", (uint64_t)baseAddr);
     }
