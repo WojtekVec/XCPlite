@@ -24,6 +24,28 @@ target_include_directories(${CRT_DLL_TARGET_NAME} PUBLIC
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via"
 )
 
+# Apply source grouping only when using Visual Studio on Windows
+if(MSVC)
+    # private files
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/crt.cpp")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/crt.h")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/nlapml.cpp")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/nlapml.h")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/nlapml_i.h")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/nlapml_v.h")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/variable.cpp")
+    source_group("private" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/private/variable.h")
+    # shared source files
+    source_group("shared" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/cnpcomm.h")
+    source_group("shared" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/cnpcomm.cpp")
+    source_group("shared" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/Timer.h")
+    source_group("shared" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/Timer.cpp")
+    # via/types files
+    source_group("shared/via" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/mbd_types.h")
+    source_group("shared/via" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/via.h")
+endif()
+
+
 if(COMMON_WARNING_FLAGS)
     target_compile_options(${CRT_DLL_TARGET_NAME} PRIVATE ${COMMON_WARNING_FLAGS})
 endif()
