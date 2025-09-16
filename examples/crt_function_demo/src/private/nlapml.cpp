@@ -294,6 +294,7 @@ VNLAPMLLayer::~VNLAPMLLayer()
 
 bool VNLAPMLLayer::InitXcp() 
 {
+#ifdef XCP_TRANSPORT_LAYER_ETH
   // XCP: Set log level (1-error, 2-warning, 3-info, 4-show XCP commands)
   XcpSetLogLevel(Xcp::OptionLogLevel);
 
@@ -318,16 +319,20 @@ bool VNLAPMLLayer::InitXcp()
     return false;
   }
 
+#endif // XCP_TRANSPORT_LAYER_ETH
+
   return true;
 }
 
 void VNLAPMLLayer::ExitXcp() 
 {
+#ifdef XCP_TRANSPORT_LAYER_ETH
   // XCP: Force the disconnection of the XCP client
   XcpDisconnect();
 
   // XCP: Stop the XCP server
   XcpEthServerShutdown();
+#endif // XCP_TRANSPORT_LAYER_ETH
 }
 
 // VIANodeLayerApi

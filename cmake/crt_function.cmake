@@ -5,6 +5,7 @@ set(CRT_DLL_TARGET_NAME crt_function)
 
 # Rursively collect all source and header files from the demo project
 file(GLOB_RECURSE crt_function_SOURCES
+    "${PROJECT_ROOT}/src/xcpPlTl.h"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/*.cpp"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/*.h"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/private/*.cpp"
@@ -12,6 +13,8 @@ file(GLOB_RECURSE crt_function_SOURCES
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/*.cpp"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/*.h"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/*.h"
+    "${PROJECT_ROOT}/examples/crt_function_demo/src/xcp/*.cpp"
+    "${PROJECT_ROOT}/examples/crt_function_demo/src/xcp/*.h"
 )
 
 # Create a shared C-RT library target with the collected sources
@@ -28,6 +31,7 @@ target_include_directories(${CRT_DLL_TARGET_NAME} PUBLIC
     "${PROJECT_ROOT}/examples/crt_function_demo/src/private"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via"
+    "${PROJECT_ROOT}/examples/crt_function_demo/src/xcp"
 )
 
 # Apply source grouping only when using Visual Studio on Windows
@@ -49,6 +53,9 @@ if(MSVC)
     # via/types files
     source_group("shared/via" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/mbd_types.h")
     source_group("shared/via" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/via.h")
+    # XCP files
+    source_group("xcp" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/xcp/xcpPlTl.h")
+    source_group("xcp" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/xcp/xcpPlTl.cpp")
 endif()
 
 # Apply common warning flags if defined

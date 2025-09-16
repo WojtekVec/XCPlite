@@ -3,7 +3,7 @@
 |   xcpConfig.h
 |
 | Description:
-|   All the constant options and settings for the C_RT Project 
+|   All the constant options and settings for the C_RT Project
 |   are contained in this XCP configuration file.
 |
 | Copyright (c) Vector Informatik GmbH. All rights reserved.
@@ -14,9 +14,17 @@
 
 #include <cstdint>
 
+/* Uncomment the following line for Vector-Simulink transport layer */
+#define XCP_TRANSPORT_LAYER_PL
+
+/* Uncomment the following line for XCP-on-Ethernet usage. */
+/*
+#define XCP_TRANSPORT_LAYER_ETH
+*/
+
 namespace Xcp 
-{
-// XCP params
+{  
+  // XCP params
   static constexpr const char *OptionProjectName = "crt_function";
   static constexpr bool OptionUseTcp = false;
   static constexpr uint16_t OptionServerPort = 5555;
