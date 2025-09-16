@@ -18,9 +18,7 @@
 #define XCP_TRANSPORT_LAYER_PL
 
 /* Uncomment the following line for XCP-on-Ethernet usage. */
-/*
-#define XCP_TRANSPORT_LAYER_ETH
-*/
+//#define XCP_TRANSPORT_LAYER_ETH
 
 namespace Xcp 
 {  

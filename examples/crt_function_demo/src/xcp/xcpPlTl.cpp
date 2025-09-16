@@ -2,23 +2,45 @@
 #define XCP_PL_EXPORTS
 
 #include "xcpConfig.h"
+
+#ifdef XCP_TRANSPORT_LAYER_PL
+
 #include "xcplib.h"
 #include "xcpPlTl.h"
 
+#ifdef __cplusplus
 extern "C" 
 {
+#endif
+
+#include "xcpQueue.h"
+
   // forward the required, external XCP functions
   uint8_t XcpCommand(const uint32_t *pCommand, uint8_t len);
-}
+  void XcpStart(tQueueHandle queueHandle, bool resumeMode);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
 
 
 
 /***************************************************************************/
 /* Transport Layer Interface */
 
-HANDLE plNotifyEvent = 0;
+static struct 
+{    
+    bool isOnline = false;
 
-static int gTransportLayerDllOnline = 0;
+    // Queue
+    tQueueHandle TransmitQueue;
+
+} gXcpServer;
+
+
+
+HANDLE plNotifyEvent = 0;
 
 extern "C" 
 {
@@ -32,8 +54,18 @@ unsigned int plInit(void)
   // If XCP is not activated, the server will not start and all XCP instrumentation will be passive with minimal overhead
   XcpInit(true);
 
+  // Create queue
+  gXcpServer.TransmitQueue = QueueInit(Xcp::OptionQueueSize);
+  if (gXcpServer.TransmitQueue == NULL)
+  {
+    return false;
+  }
+
+  // Start XCP protocol layer
+  XcpStart(gXcpServer.TransmitQueue, false);
+
   // set the server to online state
-  gTransportLayerDllOnline = 1;
+  gXcpServer.isOnline = true;
 
   return 0;
 }
@@ -50,7 +82,7 @@ unsigned int plSetParams(void *blob)
 unsigned int plOpen(void) 
 {
   /* Establish the comunication */
-  gTransportLayerDllOnline = 1;
+  gXcpServer.isOnline = 1;
 
   return 0;
 }
@@ -59,7 +91,7 @@ unsigned int plOpen(void)
 unsigned int plClose(void) 
 {
   /* Finish the comunication */
-  gTransportLayerDllOnline = 0;
+  gXcpServer.isOnline = 0;
 
   return 0;
 }
@@ -69,7 +101,7 @@ unsigned int plExit(void)
 {
   /* Delete temporary files */
   /* Free memory */
-  gTransportLayerDllOnline = 0;
+  gXcpServer.isOnline = 0;
 
   return 0;
 }
@@ -90,7 +122,7 @@ unsigned int plFlushReceiveQueue()
 /* Returns */
 unsigned int plTransmit(unsigned int len, unsigned char *pData)
 {
-  if (gTransportLayerDllOnline) 
+  if (gXcpServer.isOnline) 
   {
     const uint32_t *cmdBuf = (const uint32_t *)pData;
     XcpCommand(cmdBuf, len);
@@ -116,7 +148,7 @@ unsigned int plSetNotification(ptrdiff_t *pHandle, int queueLevel)
 unsigned int plReceive(unsigned int *lenp, unsigned char **msgp) 
 {
   /* Check the send queue of the XCP driver */
-  if (gTransportLayerDllOnline) 
+  if (gXcpServer.isOnline) 
   {
     // TODO: the call to plReceive expcets XCP data to be written to the message data pointer with the corresponding length
     return 0;
@@ -125,3 +157,5 @@ unsigned int plReceive(unsigned int *lenp, unsigned char **msgp)
 }
 
 } // extern "C"
+
+#endif // XCP_TRANSPORT_LAYER_ETH
