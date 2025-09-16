@@ -1,7 +1,9 @@
 # === C-RT Function DLL Project ===
 
+# Define the target name for the shared C-RT library
 set(CRT_DLL_TARGET_NAME crt_function)
 
+# Rursively collect all source and header files from the demo project
 file(GLOB_RECURSE crt_function_SOURCES
     "${PROJECT_ROOT}/examples/crt_function_demo/src/*.cpp"
     "${PROJECT_ROOT}/examples/crt_function_demo/src/*.h"
@@ -12,9 +14,13 @@ file(GLOB_RECURSE crt_function_SOURCES
     "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/*.h"
 )
 
+# Create a shared C-RT library target with the collected sources
 add_library(${CRT_DLL_TARGET_NAME} SHARED ${crt_function_SOURCES})
+
+# Explicitly set the linker language to C++
 set_target_properties(${CRT_DLL_TARGET_NAME} PROPERTIES LINKER_LANGUAGE C++)
 
+# Specify public include directories for the target
 target_include_directories(${CRT_DLL_TARGET_NAME} PUBLIC
     "${PROJECT_ROOT}"
     "${PROJECT_ROOT}/src"
@@ -45,13 +51,20 @@ if(MSVC)
     source_group("shared/via" FILES "${PROJECT_ROOT}/examples/crt_function_demo/src/shared/via/via.h")
 endif()
 
-
+# Apply common warning flags if defined
 if(COMMON_WARNING_FLAGS)
     target_compile_options(${CRT_DLL_TARGET_NAME} PRIVATE ${COMMON_WARNING_FLAGS})
 endif()
 
+# Define preprocessor macros for Windows builds
+
 if(WIN32)
-    target_compile_definitions(${CRT_DLL_TARGET_NAME} PRIVATE _CRT_SECURE_NO_WARNINGS _BUILDNODELAYERDLL XCP_ENABLE_ABS_ADDRESSING)
+    target_compile_definitions(${CRT_DLL_TARGET_NAME} PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        _BUILDNODELAYERDLL
+        XCP_ENABLE_ABS_ADDRESSING
+    )
 endif()
 
+# Link against the xcplib library
 target_link_libraries(${CRT_DLL_TARGET_NAME} PRIVATE xcplib)
